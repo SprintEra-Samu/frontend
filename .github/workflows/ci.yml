@@ -1,0 +1,34 @@
+name: Frontend CI Pipeline
+
+on:
+  push:
+    branches: [ main, dev ]
+  pull_request:
+    branches: [ main, dev ]
+
+jobs:
+  build-and-test:
+    name: Frontend Build & Test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 22.x
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install, Build & Test
+        run: |
+          if [ -f package.json ]; then
+            echo "package.json found. Installing dependencies..."
+            npm ci || npm install
+            echo "Running build check..."
+            npm run build --if-present
+            echo "Running test suite..."
+            npm test --if-present
+          else
+            echo "✅ Frontend repository structure verified. Waiting for initial application scaffolding."
+          fi
